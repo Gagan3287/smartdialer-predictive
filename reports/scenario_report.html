@@ -1,0 +1,606 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>SmartDialer Predictive Mode Scenario Report</title>
+        <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; background-color: #0f172a; color: #f8fafc; }
+            h1 { color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+            .card { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 25px; border: 1px solid #334155; }
+            .card h2 { color: #f1f5f9; margin-top: 0; }
+            .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
+            .stat-box { background: #0f172a; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #334155; }
+            .stat-value { font-size: 24px; font-weight: bold; color: #38bdf8; }
+            .stat-label { font-size: 12px; color: #94a3b8; margin-top: 5px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+            th, td { border: 1px solid #334155; padding: 10px; text-align: center; }
+            th { background-color: #334155; color: #f8fafc; }
+            tr:nth-child(even) { background-color: #1e293b; }
+            tr:nth-child(odd) { background-color: #0f172a; }
+            .tag { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+            .tag-APPROVE { background: #059669; color: white; }
+            .tag-REDUCE { background: #d97706; color: white; }
+            .tag-REJECT { background: #dc2626; color: white; }
+            .tag-FALLBACK_PROGRESSIVE { background: #7c3aed; color: white; }
+        </style>
+    </head>
+    <body>
+        <h1>SmartDialer Predictive Mode Benchmark Report</h1>
+        <p style="color: #94a3b8;">Automated performance evaluation across Scenarios A/B/C/D</p>
+    
+        <div class="card">
+            <h2>Scenario A</h2>
+            <p style="color: #cbd5e1;"><em>Low Answer Rate (20%), Standard Talk Time (120s), ProviderA</em></p>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value">90.0%</div>
+                    <div class="stat-label">Avg Agent Utilization</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">50</div>
+                    <div class="stat-label">Total Calls Initiated</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Pacing Approved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Safety Capped (Reduced)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Progressive Fallbacks</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tick</th>
+                        <th>Utilization</th>
+                        <th>Available Agents</th>
+                        <th>Busy Agents</th>
+                        <th>Pacing Rec (N)</th>
+                        <th>Safety Action</th>
+                        <th>Allocated Calls</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td>1</td>
+                        <td>0.0%</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td>125</td>
+                        <td><span class="tag tag-REDUCE">REDUCE</span></td>
+                        <td>50</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>4</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>5</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>6</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>7</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>8</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>9</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>10</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>Scenario B</h2>
+            <p style="color: #cbd5e1;"><em>Medium Answer Rate (50%), Short Talk Time (90s), ProviderA</em></p>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value">89.8%</div>
+                    <div class="stat-label">Avg Agent Utilization</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">50</div>
+                    <div class="stat-label">Total Calls Initiated</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Pacing Approved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Safety Capped (Reduced)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Progressive Fallbacks</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tick</th>
+                        <th>Utilization</th>
+                        <th>Available Agents</th>
+                        <th>Busy Agents</th>
+                        <th>Pacing Rec (N)</th>
+                        <th>Safety Action</th>
+                        <th>Allocated Calls</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td>1</td>
+                        <td>0.0%</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td>125</td>
+                        <td><span class="tag tag-REDUCE">REDUCE</span></td>
+                        <td>49</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2</td>
+                        <td>98.0%</td>
+                        <td>1</td>
+                        <td>49</td>
+                        <td>595</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>4</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>5</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>6</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>7</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>8</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>9</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>10</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>505</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>Scenario C</h2>
+            <p style="color: #cbd5e1;"><em>High Answer Rate (70%), Long Talk Time (180s), ProviderA</em></p>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value">90.0%</div>
+                    <div class="stat-label">Avg Agent Utilization</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">50</div>
+                    <div class="stat-label">Total Calls Initiated</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Pacing Approved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Safety Capped (Reduced)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Progressive Fallbacks</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tick</th>
+                        <th>Utilization</th>
+                        <th>Available Agents</th>
+                        <th>Busy Agents</th>
+                        <th>Pacing Rec (N)</th>
+                        <th>Safety Action</th>
+                        <th>Allocated Calls</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td>1</td>
+                        <td>0.0%</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td>125</td>
+                        <td><span class="tag tag-REDUCE">REDUCE</span></td>
+                        <td>50</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>4</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>5</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>6</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>7</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>8</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>9</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>10</td>
+                        <td>100.0%</td>
+                        <td>0</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td><span class="tag tag-REJECT">REJECT</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>Scenario D</h2>
+            <p style="color: #cbd5e1;"><em>Dynamic Answer Rate (30% -> 60%), Variable Talk Time, Flaky ProviderB Latency/Failures</em></p>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value">80.2%</div>
+                    <div class="stat-label">Avg Agent Utilization</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">49</div>
+                    <div class="stat-label">Total Calls Initiated</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Pacing Approved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Safety Capped (Reduced)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Progressive Fallbacks</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tick</th>
+                        <th>Utilization</th>
+                        <th>Available Agents</th>
+                        <th>Busy Agents</th>
+                        <th>Pacing Rec (N)</th>
+                        <th>Safety Action</th>
+                        <th>Allocated Calls</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td>1</td>
+                        <td>0.0%</td>
+                        <td>50</td>
+                        <td>0</td>
+                        <td>125</td>
+                        <td><span class="tag tag-REDUCE">REDUCE</span></td>
+                        <td>41</td>
+                    </tr>
+            
+                    <tr>
+                        <td>2</td>
+                        <td>82.0%</td>
+                        <td>9</td>
+                        <td>41</td>
+                        <td>1371</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>3</td>
+                        <td>84.0%</td>
+                        <td>8</td>
+                        <td>42</td>
+                        <td>1283</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>4</td>
+                        <td>86.0%</td>
+                        <td>7</td>
+                        <td>43</td>
+                        <td>1194</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>5</td>
+                        <td>88.0%</td>
+                        <td>6</td>
+                        <td>44</td>
+                        <td>1106</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>6</td>
+                        <td>90.0%</td>
+                        <td>5</td>
+                        <td>45</td>
+                        <td>1017</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>0</td>
+                    </tr>
+            
+                    <tr>
+                        <td>7</td>
+                        <td>90.0%</td>
+                        <td>5</td>
+                        <td>45</td>
+                        <td>1017</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>8</td>
+                        <td>92.0%</td>
+                        <td>4</td>
+                        <td>46</td>
+                        <td>928</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>9</td>
+                        <td>94.0%</td>
+                        <td>3</td>
+                        <td>47</td>
+                        <td>840</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                    <tr>
+                        <td>10</td>
+                        <td>96.0%</td>
+                        <td>2</td>
+                        <td>48</td>
+                        <td>751</td>
+                        <td><span class="tag tag-FALLBACK_PROGRESSIVE">FALLBACK_PROGRESSIVE</span></td>
+                        <td>1</td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+    </body>
+    </html>
+    
