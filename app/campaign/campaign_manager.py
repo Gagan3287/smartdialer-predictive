@@ -48,19 +48,28 @@ class CampaignManager:
 
         # Rolling answer rate & abandon rate over recent calls (last 50 calls)
         async with conn.execute(
-            "SELECT state FROM calls WHERE state IN ('COMPLETED', 'FAILED', 'CANCELLED') ORDER BY updated_at DESC LIMIT 50"
+            "SELECT state FROM calls WHERE state IN ('COMPLETED', 'FAILED', 'CANCELLED', 'ABANDONED') ORDER BY updated_at DESC LIMIT 50"
         ) as cursor:
             recent_calls = await cursor.fetchall()
 
         if recent_calls:
             total_finished = len(recent_calls)
-            answered_cnt = sum(1 for r in recent_calls if r["state"] in ("CONNECTED", "COMPLETED"))
-            abandoned_cnt = sum(1 for r in recent_calls if r["state"] == "FAILED")
+            answered_cnt = sum(1 for r in recent_calls if r["state"] == "COMPLETED")
+            # Abandon rate = compliance-relevant abandonment only: borrower
+            # answered but no agent was free. NOT the same as a plain no-answer
+            # (FAILED), which is normal call outcome noise, not a compliance risk.
+            abandoned_cnt = sum(1 for r in recent_calls if r["state"] == "ABANDONED")
+            # Technical failure rate = dial-time / no-answer failures. A spike here
+            # signals a broken telecom provider, not borrower-side abandonment --
+            # a distinct risk the Safety Controller must also react to.
+            failed_cnt = sum(1 for r in recent_calls if r["state"] == "FAILED")
             rolling_answer_rate = answered_cnt / total_finished
             rolling_abandon_rate = abandoned_cnt / total_finished
+            rolling_failure_rate = failed_cnt / total_finished
         else:
             rolling_answer_rate = 0.40  # Default initial historical assumption
             rolling_abandon_rate = 0.0
+            rolling_failure_rate = 0.0
 
         return {
             "available_agents": available_agents,
@@ -68,10 +77,15 @@ class CampaignManager:
             "calls_ringing": calls_ringing,
             "calls_connected": calls_connected,
             "rolling_answer_rate": rolling_answer_rate,
-            "rolling_abandon_rate": rolling_abandon_rate
+            "rolling_abandon_rate": rolling_abandon_rate,
+            "rolling_failure_rate": rolling_failure_rate
         }
-
-    async def execute_pacing_tick(self, conn: aiosqlite.Connection, campaign_id: str) -> Dict[str, Any]:
+    async def execute_pacing_tick(
+        self,
+        conn: aiosqlite.Connection,
+        campaign_id: str,
+        answer_rate_override: float = None
+    ) -> Dict[str, Any]:
         """
         Executes one full iteration of the SmartDialer pipeline:
         1. Metrics Gathering
@@ -79,8 +93,16 @@ class CampaignManager:
         3. Safety Controller Override Check
         4. Allocation (Predictive Batch or Progressive 1:1)
         5. Audit Logging
+
+        answer_rate_override: when provided (e.g. by a scenario simulation),
+        overrides the DB-derived rolling answer rate for this tick. Useful when
+        there isn't yet enough real call history to compute a meaningful rolling
+        average, or when simulating a known/configured answer rate scenario.
         """
         metrics = await self.get_metrics(conn)
+
+        if answer_rate_override is not None:
+            metrics["rolling_answer_rate"] = answer_rate_override
 
         # Step 1: Predictive Pacing Calculation
         pacing_rec = self.pacing_engine.calculate_recommendation(
@@ -97,9 +119,9 @@ class CampaignManager:
             available_agents=metrics["available_agents"],
             predicted_answer_rate=metrics["rolling_answer_rate"],
             recent_abandon_rate=metrics["rolling_abandon_rate"],
+            recent_failure_rate=metrics["rolling_failure_rate"],
             current_ringing_calls=metrics["calls_ringing"]
         )
-
         # Step 3: Execution based on Safety Decision
         allocated_calls = []
 

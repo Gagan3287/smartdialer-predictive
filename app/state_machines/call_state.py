@@ -14,6 +14,7 @@ class CallState(str, Enum):
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
     CANCELLED = "CANCELLED"
+    ABANDONED = "ABANDONED"  # Borrower answered but no agent was available to take the call
 
 STATE_RANK: Dict[CallState, int] = {
     CallState.QUEUED: 1,
@@ -25,20 +26,26 @@ STATE_RANK: Dict[CallState, int] = {
     CallState.COMPLETED: 7,
     CallState.FAILED: 7,
     CallState.CANCELLED: 7,
+    CallState.ABANDONED: 7,
 }
 
-TERMINAL_STATES = {CallState.COMPLETED, CallState.FAILED, CallState.CANCELLED}
+TERMINAL_STATES = {CallState.COMPLETED, CallState.FAILED, CallState.CANCELLED, CallState.ABANDONED}
 
 VALID_CALL_TRANSITIONS: Dict[CallState, Set[CallState]] = {
-    CallState.QUEUED: {CallState.RESERVED, CallState.CANCELLED},
+    # QUEUED can go straight to INITIATED for predictive dialing, where an
+    # agent is NOT pre-reserved -- reservation is attempted only after answer.
+    CallState.QUEUED: {CallState.RESERVED, CallState.INITIATED, CallState.CANCELLED},
     CallState.RESERVED: {CallState.INITIATED, CallState.FAILED, CallState.CANCELLED},
     CallState.INITIATED: {CallState.RINGING, CallState.FAILED, CallState.CANCELLED, CallState.COMPLETED},
-    CallState.RINGING: {CallState.ANSWERED, CallState.FAILED, CallState.CANCELLED, CallState.COMPLETED},
-    CallState.ANSWERED: {CallState.CONNECTED, CallState.COMPLETED, CallState.FAILED},
+    # A predictive call can be answered with no agent available -- that is a
+    # true (compliance-relevant) abandoned call, distinct from FAILED (no answer).
+    CallState.RINGING: {CallState.ANSWERED, CallState.FAILED, CallState.CANCELLED, CallState.COMPLETED, CallState.ABANDONED},
+    CallState.ANSWERED: {CallState.CONNECTED, CallState.COMPLETED, CallState.FAILED, CallState.ABANDONED},
     CallState.CONNECTED: {CallState.COMPLETED, CallState.FAILED},
     CallState.COMPLETED: set(),
     CallState.FAILED: set(),
     CallState.CANCELLED: set(),
+    CallState.ABANDONED: set(),
 }
 
 class InvalidCallStateTransitionError(Exception):
