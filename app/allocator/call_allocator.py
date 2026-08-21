@@ -117,8 +117,13 @@ class CallAllocator:
                     borrower_answered = random.random() < self.simulated_answer_rate
 
                     if not borrower_answered:
+                        # NOTE the "NO_ANSWER:" prefix -- this distinguishes an
+                        # ordinary simulated no-pickup from a real technical/provider
+                        # failure below. Both land in CallState.FAILED, but only
+                        # true technical failures should count toward the Safety
+                        # Controller's provider-health signal (see campaign_manager.py).
                         await CallStateMachine.transition(
-                            conn, call_id, CallState.FAILED, error_message="No answer (simulated)"
+                            conn, call_id, CallState.FAILED, error_message="NO_ANSWER: simulated no pickup"
                         )
                         attempts = borrower["attempts"] + 1
                         new_status = "PENDING" if attempts < self.max_retries else "FAILED"
@@ -162,6 +167,9 @@ class CallAllocator:
                 })
 
             except (TelecomProviderError, Exception) as err:
+                # A real technical/provider failure -- error_message here does NOT
+                # carry the "NO_ANSWER:" prefix, so it correctly counts toward the
+                # Safety Controller's technical failure rate (provider health signal).
                 logger.error(f"[CallAllocator] Dial failed for {call_id}: {err}")
                 await CallStateMachine.transition(conn, call_id, CallState.FAILED, error_message=str(err))
                 attempts = borrower["attempts"] + 1

@@ -46,9 +46,9 @@ class CampaignManager:
         calls_ringing = call_counts.get("RINGING", 0) + call_counts.get("INITIATED", 0)
         calls_connected = call_counts.get("CONNECTED", 0)
 
-        # Rolling answer rate & abandon rate over recent calls (last 50 calls)
+        # Rolling answer rate, abandon rate, and failure rate over recent calls
         async with conn.execute(
-            "SELECT state FROM calls WHERE state IN ('COMPLETED', 'FAILED', 'CANCELLED', 'ABANDONED') ORDER BY updated_at DESC LIMIT 50"
+            "SELECT state, error_message FROM calls WHERE state IN ('COMPLETED', 'FAILED', 'CANCELLED', 'ABANDONED') ORDER BY updated_at DESC LIMIT 50"
         ) as cursor:
             recent_calls = await cursor.fetchall()
 
@@ -59,10 +59,15 @@ class CampaignManager:
             # answered but no agent was free. NOT the same as a plain no-answer
             # (FAILED), which is normal call outcome noise, not a compliance risk.
             abandoned_cnt = sum(1 for r in recent_calls if r["state"] == "ABANDONED")
-            # Technical failure rate = dial-time / no-answer failures. A spike here
-            # signals a broken telecom provider, not borrower-side abandonment --
-            # a distinct risk the Safety Controller must also react to.
-            failed_cnt = sum(1 for r in recent_calls if r["state"] == "FAILED")
+            # Technical failure rate = TRUE provider/technical errors only.
+            # A plain "no answer" (tagged NO_ANSWER: by the allocator) is normal
+            # call outcome noise, not a provider health signal -- conflating the
+            # two would make the Safety Controller panic-trigger FALLBACK_PROGRESSIVE
+            # at any low answer-rate scenario even when the provider is healthy.
+            failed_cnt = sum(
+                1 for r in recent_calls
+                if r["state"] == "FAILED" and not (r["error_message"] or "").startswith("NO_ANSWER:")
+            )
             rolling_answer_rate = answered_cnt / total_finished
             rolling_abandon_rate = abandoned_cnt / total_finished
             rolling_failure_rate = failed_cnt / total_finished
@@ -80,6 +85,7 @@ class CampaignManager:
             "rolling_abandon_rate": rolling_abandon_rate,
             "rolling_failure_rate": rolling_failure_rate
         }
+
     async def execute_pacing_tick(
         self,
         conn: aiosqlite.Connection,
@@ -122,6 +128,7 @@ class CampaignManager:
             recent_failure_rate=metrics["rolling_failure_rate"],
             current_ringing_calls=metrics["calls_ringing"]
         )
+
         # Step 3: Execution based on Safety Decision
         allocated_calls = []
 
