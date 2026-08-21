@@ -26,8 +26,14 @@ class SafetyDecision:
     reason: str
 
 class SafetyController:
-    def __init__(self, target_abandon_rate: float = 0.03, progressive_dialer: Optional[ProgressiveDialer] = None):
+    def __init__(
+        self,
+        target_abandon_rate: float = 0.03,
+        target_failure_rate: float = 0.50,
+        progressive_dialer: Optional[ProgressiveDialer] = None
+    ):
         self.target_abandon_rate = target_abandon_rate
+        self.target_failure_rate = target_failure_rate  # Provider health threshold (technical failures)
         self.progressive_dialer = progressive_dialer
 
     def evaluate(
@@ -36,12 +42,17 @@ class SafetyController:
         available_agents: int,
         predicted_answer_rate: float,
         recent_abandon_rate: float,
+        recent_failure_rate: float = 0.0,
         current_ringing_calls: int = 0
     ) -> SafetyDecision:
         """
         Independently checks and caps raw recommended calls N from Predictive Pacing Engine.
+        Reacts to TWO distinct risk signals:
+        - recent_abandon_rate: borrower-side compliance risk (answered, no agent free)
+        - recent_failure_rate: provider-side technical risk (dial failures / no-answers spiking,
+          which can indicate a broken telecom provider rather than borrower abandonment)
         """
-        # 1. Check abandon rate breach
+        # 1. Check abandon rate breach (compliance risk)
         if recent_abandon_rate > self.target_abandon_rate:
             reason = (
                 f"Abandon rate {recent_abandon_rate:.2%} exceeds target {self.target_abandon_rate:.2%}. "
@@ -58,7 +69,24 @@ class SafetyController:
                 reason=reason
             )
 
-        # 2. Compute dynamic safety buffer based on answer rate
+        # 2. Check technical failure rate breach (provider health risk)
+        if recent_failure_rate > self.target_failure_rate:
+            reason = (
+                f"Technical failure rate {recent_failure_rate:.2%} exceeds threshold {self.target_failure_rate:.2%}. "
+                "Likely provider outage -- triggering FALLBACK_PROGRESSIVE mode."
+            )
+            logger.warning(f"[SafetyController] {reason}")
+            return SafetyDecision(
+                action=SafetyAction.FALLBACK_PROGRESSIVE,
+                approved_calls=available_agents,
+                raw_recommended=raw_recommendation,
+                max_allowed=available_agents,
+                abandon_rate=recent_abandon_rate,
+                target_abandon_rate=self.target_abandon_rate,
+                reason=reason
+            )
+
+        # 3. Compute dynamic safety buffer based on answer rate
         buffer = math.ceil(available_agents * (1.0 - max(0.05, min(0.95, predicted_answer_rate))))
         max_allowed = max(0, available_agents + buffer - current_ringing_calls)
 

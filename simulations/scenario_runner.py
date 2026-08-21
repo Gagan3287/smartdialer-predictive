@@ -102,7 +102,7 @@ async def run_scenario(name: str, spec: dict) -> dict:
     pacing = PredictivePacingEngine(default_setup_time=spec["setup_time"], default_talk_time=spec["talk_time"])
     prog_dialer = ProgressiveDialer(provider=provider)
     safety = SafetyController(target_abandon_rate=0.03, progressive_dialer=prog_dialer)
-    allocator = CallAllocator(provider=provider)
+    allocator = CallAllocator(provider=provider, simulated_answer_rate=spec["answer_rate"])
     campaign = CampaignManager(pacing, safety, allocator, prog_dialer)
 
     tick_history = []
@@ -110,8 +110,9 @@ async def run_scenario(name: str, spec: dict) -> dict:
     total_calls_initiated = 0
 
     for tick in range(1, spec["ticks"] + 1):
-        # Override answer rate for scenario spec in pacing engine if needed
-        res = await campaign.execute_pacing_tick(conn, f"camp-{name}")
+        res = await campaign.execute_pacing_tick(
+            conn, f"camp-{name}", answer_rate_override=spec["answer_rate"]
+        )
         action = res["safety"]["action"]
         safety_actions_count[action] = safety_actions_count.get(action, 0) + 1
         total_calls_initiated += res["allocated_calls_count"]
