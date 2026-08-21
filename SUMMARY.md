@@ -34,4 +34,16 @@ graph TD
 ### 3. Dynamic Buffer Allocation & Quantile Confidence Windows
 - Rather than static multipliers, the predictive engine scales over-dialing using confidence intervals. When historical answer rate variance is low, over-dialing is expanded to maximize utilization. When variance spikes or call setup time increases, the safety controller shrinks the over-dialing window toward $1:1$ progressive allocation.
 
+### 4. What Testing Revealed (and How the Design Responded)
+
+The description above is the intended design -- but building the dual-engine architecture correctly required finding and closing gaps between intent and implementation, discovered through direct testing rather than code review:
+
+- **A naive predictive allocator can silently degrade into progressive behavior.** If agent reservation isn't deliberately decoupled from dialing, the allocator ends up unable to ever dial more calls than there are agents -- defeating the entire purpose of predictive mode, even while the Safety Controller believes it approved a genuine over-dial. The fix was to let dialing proceed independent of agent availability, and resolve the agent question only at the moment of actual answer, with a true `ABANDONED` outcome -- not a silently enforced cap -- when no agent is free.
+- **Abandon rate alone is an incomplete safety signal.** A borrower-side metric (answered, no agent) says nothing about a broken telecom provider, since a 100% dial-failure outage produces a 0% abandon rate. The Safety Controller needed a second, independent signal for provider/technical health, separate from and evaluated alongside abandon rate.
+- **Not every failed call is equally meaningful.** Conflating "no answer" (expected, routine, especially at low answer rates) with "technical failure" (a real provider-health signal) causes the Safety Controller to over-trigger fallback even when nothing is actually wrong. The two needed to be tagged and counted separately.
+
+Each of these was caught by running the actual simulation suite against varied scenarios and reading the resulting numbers critically rather than assuming a passing test meant correct behavior -- which is itself the point: correctness in a safety-critical dialer can't be verified by code review alone, it has to be exercised.
+
+---
+
 By isolating the **Predictive Pacing Engine** from telecom execution and routing all dialing decisions through the **Safety Controller** and **Progressive Dialer**, the system delivers maximal utilization during stable conditions and deterministic, zero-abandon compliance during sudden traffic spikes or provider anomalies.
