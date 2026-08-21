@@ -11,9 +11,9 @@ $$\text{Campaign} \longrightarrow \text{Predictive Pacing Engine} \longrightarro
 
 1. **Explicit State Machines**:
    - **Agent State Machine**: States (`OFFLINE`, `AVAILABLE`, `RESERVED`, `DIALING`, `CONNECTED`, `WRAP_UP`, `PAUSED`). Enforces concurrency safety using per-agent `asyncio.Lock` and optimistic locking (`version` column).
-   - **Call State Machine**: Idempotent against duplicate events, out-of-order events, and worker task crashes.
+   - **Call State Machine**: States (`QUEUED`, `RESERVED`, `INITIATED`, `RINGING`, `ANSWERED`, `CONNECTED`, `COMPLETED`, `FAILED`, `CANCELLED`, `ABANDONED`). Idempotent against duplicate events, out-of-order events, and worker task crashes. `ABANDONED` is a compliance-relevant terminal state meaning the borrower answered but no agent was available — only reachable in predictive mode.
 2. **Predictive Pacing Engine**: Rule-based pacing calculation computing expected agent free rates, ringing answer probabilities, and raw call recommendations $N$ with full step-by-step reasoning logs.
-3. **Safety Controller**: Independent compliance gatekeeper capping calls, monitoring abandon rate limits ($3.0\%$), and triggering fallback to Progressive mode.
+3. **Safety Controller**: Independent compliance gatekeeper evaluating two signals: `rolling_abandon_rate` (borrower-side risk, threshold 3.0%) and `rolling_failure_rate` (provider/technical health). Either signal alone can trigger fallback to Progressive mode.
 4. **Standalone Progressive Dialer**: Dedicated $1:1$ allocation module reserving agents prior to dialing, handling agent dropouts, failure retries, and preventing over-allocation.
 5. **Telecom Provider Drivers**: Swappable interfaces for `ProviderA` (fast & reliable) and `ProviderB` (slow, flaky, duplicate/out-of-order events).
 6. **Worker Crash Recovery**: Background reconciliation engine detecting half-committed calls/agents and releasing orphaned resources.
@@ -31,7 +31,7 @@ $$\text{Campaign} \longrightarrow \text{Predictive Pacing Engine} \longrightarro
 ```bash
 pip install -r requirements.txt
 ```
-*(Or install directly: `pip install fastapi uvicorn pydantic pytest-asyncio aiosqlite`)*
+*(Or install directly: `pip install fastapi uvicorn pydantic aiosqlite pytest pytest-asyncio`)*
 
 ---
 
